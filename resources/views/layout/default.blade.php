@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="{{ app()->getLocale() }}"{{ (!empty($htmlAttribute)) ? $htmlAttribute : '' }}>
 <head>
+	<meta name="csrf-token" content="{{ csrf_token() }}">
 	@include('partial.head')
 </head>
 <body class="{{ (!empty($bodyClass)) ? $bodyClass : '' }}">

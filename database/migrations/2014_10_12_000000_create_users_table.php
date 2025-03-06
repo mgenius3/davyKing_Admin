@@ -20,6 +20,7 @@ class CreateUsersTable extends Migration
             $table->string('phone')->nullable();
             $table->decimal('wallet_balance', 15, 2)->default(0);
             $table->boolean('is_verified')->default(false);
+            $table->boolean('is_admin')->default(false);
             $table->timestamp('date_joined')->useCurrent();
             $table->timestamp('last_login')->nullable();
             $table->string('referral_code')->nullable();

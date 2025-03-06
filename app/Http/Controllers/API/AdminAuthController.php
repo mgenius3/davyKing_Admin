@@ -16,7 +16,7 @@ class AdminAuthController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|unique:admins',
-            'password' => 'required|string|min:6|confirmed',
+            'password' => 'required|string|min:6|confirmed'
         ]);
 
         $admin = Admin::create([
@@ -34,7 +34,7 @@ class AdminAuthController extends Controller
     {
 
         // Log the request data
-        Log::info('Login Request Data:', $request->all());
+        // dump('Login Request Data:', $request->all());
 
         $credentials = $request->validate([
             'email' => 'required|string|email',
@@ -42,16 +42,12 @@ class AdminAuthController extends Controller
         ]);
 
         $admin = Admin::where('email', $credentials['email'])->first();
-
         if (!$admin || !Hash::check($credentials['password'], $admin->password)) {
             return response()->json(['message' => 'Invalid credentials'], 401);
         }
-
         $token = $admin->createToken('admin_token', ['admin'])->plainTextToken;
-
         // Store the admin token in the session
         session(['admin_token' => $token]);
-
         return response()->json(['admin' => $admin, 'token' => $token], 200);
     }
 

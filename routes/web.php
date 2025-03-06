@@ -2,6 +2,10 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\WEB\UserManagementController;
+use App\Http\Controllers\WEB\WebAuthController;
+use Illuminate\Support\Facades\Artisan;
+use App\Http\Controllers\WEB\AdminGiftCardController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -14,26 +18,70 @@ use App\Http\Controllers\WEB\UserManagementController;
 |
 */
 
-
 Route::get('/', function () {
 	return view('/pages/index');
 });
 
-Route::get('/auth/login', function(){
- return view('/auth/login');
+Route::get('/auth/login', function () {
+	return view('/auth/login');
+})->name("user.login");
+
+// User authentication routes
+Route::prefix('user')->group(function () {
+	// Route::post('/register', [AuthController::class, 'register']);
+	Route::post('/login', [WebAuthController::class, 'login'])->name('web.login');
+	Route::post('/logout', [WebAuthController::class, 'logout'])->name('web.logout');
 });
 
+
+//USERS MANAGEMENT
+Route::middleware(['auth'])->group(function () {
+	Route::prefix('users')->group(function () {
+		Route::get('/', [UserManagementController::class, 'index'])->name('users.index');
+		Route::get('/create_user', function () {
+			return view('/user_management/create_user');
+		});
+		// Route::post('/create_user', [UserManagementController::class, 'create_user'])->name('users.create_user');
+		Route::get('/{id}/edit', [UserManagementController::class, 'edit'])->name('users.edit');
+		Route::get('/{id}', [UserManagementController::class, 'show'])->name('users.get');
+	});
+});
+
+//ADMIN GIFTCARD
+Route::prefix('gift-cards')->middleware(['auth', 'admin'])->group(function () {
+	Route::post('/', [AdminGiftCardController::class, 'store'])->name('admin.gift-cards.store'); //create new giftcards
+	Route::put('/{giftCardId}', [AdminGiftCardController::class, 'update'])->name('admin.gift-cards.update'); // update giftcards
+
+	Route::get('/', [AdminGiftCardController::class, 'displayGiftCard'])->name('admin.gift-cards'); //get giftcard dashboard
+	Route::post('/update-rates', [AdminGiftCardController::class, 'updateRates'])->name('admin.gift-cards.update-rates');
+
+	Route::get('/index', [AdminGiftCardController::class, 'index']); // List gift cards
+	Route::get('/transaction/{transactionId}', [AdminGiftCardController::class, 'transaction'])->name('admin.gift-cards.transaction'); //single transactions
+	Route::get('/transactions', [AdminGiftCardController::class, 'transactions']); // List transactions
+	Route::get('/transaction/{transactionId}/edit-status', [AdminGiftCardController::class, 'editTransactionStatus'])->name('admin.gift-cards.edit-transaction-status');
+	Route::put('/transactions/{transactionId}', [AdminGiftCardController::class, 'updateTransactionStatus'])->name('admin.gift-cards.update-transaction-status'); // Update transaction status
+	Route::put('/{giftCardId}/rates', [AdminGiftCardController::class, 'updateRates']); // Update rates
+	Route::put('/{giftCardId}/toggle', [AdminGiftCardController::class, 'toggle']); // Toggle availability
+
+	Route::get('/create-transaction', [AdminGiftCardController::class, 'createTransaction'])->name('admin.gift-cards.create-transaction');
+	Route::post('/store-transaction', [AdminGiftCardController::class, 'storeTransaction'])->name('admin.gift-cards.store-transaction');
+	Route::get('/created-transactions', [AdminGiftCardController::class, 'createdTransactions'])->name('admin.gift-cards.created-transactions');
+	Route::get('/all-transactions', [AdminGiftCardController::class, 'allTransactions'])->name('admin.gift-cards.all-transactions');
+	Route::get('/user-transactions/{userId}', [AdminGiftCardController::class, 'userTransactions'])->name('admin.gift-cards.user-transactions');
+});
 
 Route::get('/analytics', function () {
 	return view('/pages/analytics');
 });
 
+Route::get('/clear-cache', function () {
+	Artisan::call('cache:clear');
+	Artisan::call('config:clear');
+	Artisan::call('route:clear');
+	Artisan::call('view:clear');
+	return "Cache cleared successfully!";
+});
 
-//USERS MANAGEMENT
-// Route::get('/users', function(){
-// 	return view('/user_management/user_list');
-// });
-Route::get('/users', [UserManagementController::class, 'index']);
 Route::get('/email/inbox', function () {
 	return view('/pages/email-inbox');
 });
@@ -155,15 +203,15 @@ Route::get('/layout/minified-sidebar', function () {
 });
 
 Route::get('/layout/top-nav', function () {
-    return view('/pages/layout-top-nav');
+	return view('/pages/layout-top-nav');
 });
 
 Route::get('/layout/mixed-nav', function () {
-    return view('/pages/layout-mixed-nav');
+	return view('/pages/layout-mixed-nav');
 });
 
 Route::get('/layout/mixed-nav-boxed-layout', function () {
-    return view('/pages/layout-mixed-nav-boxed-layout');
+	return view('/pages/layout-mixed-nav-boxed-layout');
 });
 
 Route::get('/page/scrum-board', function () {

@@ -39,18 +39,20 @@ return [
     [
       'icon' => 'fa fa-user-circle',
       'text' => 'User List',
-      'label' => '6',
+      // 'label' => '6',
       'children' => [
         [
           'url' => '/users',
           'action' => 'AllUsers',
           'text' => 'All Users'
         ],
-        // [
-        //   'url' => '/user/compose',
-        //   'action' => 'Compose',
-        //   'text' => 'Compose'
-        // ], [
+        [
+          'url' => '/users/create_user',
+          'action' => 'Create Users',
+          'text' => 'Create Users'
+        ], 
+        
+        //[
         //   'url' => '/user/detail',
         //   'action' => 'Detail',
         //   'text' => 'Detail'
@@ -62,23 +64,26 @@ return [
     [
       'is_divider' => true
     ],
-
+    [
+      'text' => 'Gift Cards Management',
+      'is_header' => true
+    ],
     [
       'icon' => 'fa fa-envelope',
-      'text' => 'Email',
-      'label' => '6',
+      'text' => 'Gift Card',
+      // 'label' => '6',
       'children' => [[
-        'url' => '/email/inbox',
-        'action' => 'Inbox',
-        'text' => 'Inbox'
+        'url' => '/gift-cards',
+        'action' => 'Gift Cards',
+        'text' => 'Gift Cards'
       ], [
-        'url' => '/email/compose',
-        'action' => 'Compose',
-        'text' => 'Compose'
+        'url' => '/gift-cards/create-transaction',
+        'action' => 'New Transactions',
+        'text' => 'New Transactions'
       ], [
-        'url' => '/email/detail',
-        'action' => 'Detail',
-        'text' => 'Detail'
+        'url' => '/gift-cards/all-transactions',
+        'action' => 'All Transactions',
+        'text' => 'All Transactions'
       ]]
     ],
     [

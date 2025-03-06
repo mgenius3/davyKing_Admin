@@ -5,6 +5,7 @@ window.storeData = (key, data) => {
 
 // Retrieve data from localStorage
 window.getData = (key) => {
+    
     return JSON.parse(localStorage.getItem(key));
 };
 

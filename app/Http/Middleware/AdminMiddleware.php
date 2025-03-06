@@ -10,10 +10,9 @@ class AdminMiddleware
 {
     public function handle(Request $request, Closure $next)
     {
-        //check if the admin has logged in
-        if (Auth::guard('admin')->check()) {
-            return $next($request);
+        if (!$request->user() || !$request->user()->is_admin) {
+            return response()->json(['message' => 'Only Admins Allowed!'], 403);
         }
-        return response()->json(['message' => 'Access Denied'], 403);
+        return $next($request);
     }
 }

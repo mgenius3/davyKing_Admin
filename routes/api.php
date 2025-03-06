@@ -19,7 +19,6 @@ use App\Http\Controllers\API\UserController;
 
 // Version 1 (v1) of the API
 Route::prefix('v1')->group(function () {
-
     // User authentication routes
     Route::prefix('user')->group(function () {
         Route::post('/register', [AuthController::class, 'register']);
@@ -28,34 +27,33 @@ Route::prefix('v1')->group(function () {
     });
 
     // Admin authentication routes
-    Route::prefix('admin')->group(function () {
-        Route::post('/register', [AdminAuthController::class, 'register']);
-        Route::post('/login', [AdminAuthController::class, 'login']);
-        Route::post('/logout', [AdminAuthController::class, 'logout'])->middleware('auth:sanctum');
-    });
+    // Route::prefix('admin')->group(function () {
+    //     Route::post('/register', [AuthController::class, 'register']);
+    //     Route::post('/login', [AuthController::class, 'login']);
+    //     Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
+    // });
 
     // USER MANAGEMENT
-
-    
-    // Group routes that require authentication
     Route::middleware(['auth:sanctum'])->group(function () {
-        Route::get('/users', [UserController::class, 'index']);//->middleware('admin'); // Only admin
-        Route::get('/users/{id}', [UserController::class, 'show']);
-        Route::patch('/users/{id}', [UserController::class, 'update']);//->middleware('admin'); // Only admin
-        Route::delete('/users/{id}', [UserController::class, 'destroy']);//->middleware('admin'); // Only admin
+        // Group all user-related routes under 'users' prefix
+        Route::prefix('users')->group(function () {
+            Route::get('/', [UserController::class, 'index'])->middleware('admin'); // Only admin
+            // Route::post('/create', [UserController::class, 'create_user']);
+            Route::delete('/{id}', [UserController::class, 'destroy'])->name('users.destroy');
+            Route::patch('/{id}', [UserController::class, 'update']); // Update user
+            Route::get('/{id}', [UserController::class, 'show']); // View user details
+            Route::patch('/{id}/suspend', [UserController::class, 'suspendUser']);
+            Route::patch('/{id}/activate', [UserController::class, 'activateUser']);
+            Route::patch('/{id}/update-password', [UserController::class, 'updateUserPassword']);
+            Route::patch('/{id}/reset-password', [UserController::class, 'resetPassword']);
+            Route::patch('/{id}/fund-wallet', [UserController::class, 'fundWallet'])->middleware('admin');
+            Route::patch('/{id}/deduct-wallet', [UserController::class, 'deductWallet']);
+            Route::patch('/{id}/approve-kyc', [UserController::class, 'approveKYC']);
+            Route::patch('/{id}/reject-kyc', [UserController::class, 'rejectKYC']);
+        });
 
-        // Actions for Admins only
-        Route::patch('/users/{id}/ban', [UserController::class, 'banUser']);//->middleware('admin');
-        Route::patch('/users/{id}/unban', [UserController::class, 'unbanUser']);//->middleware('admin');
-        Route::patch('/users/{id}/reset-password', [UserController::class, 'resetPassword']);//->middleware('admin');
-        Route::patch('/users/{id}/fund-wallet', [UserController::class, 'fundWallet']);//->middleware('admin');
-        Route::patch('/users/{id}/deduct-wallet', [UserController::class, 'deductWallet']);//->middleware('admin');
-        Route::patch('/users/{id}/approve-kyc', [UserController::class, 'approveKYC']);//->middleware('admin');
-        Route::patch('/users/{id}/reject-kyc', [UserController::class, 'rejectKYC']);//->middleware('admin');
-
-        // Users can only update their own profile
-        Route::patch('/profile', [UserController::class, 'updateProfile']);
     });
+
 
     // Authenticated user and admin routes
     Route::middleware('auth:sanctum')->group(function () {

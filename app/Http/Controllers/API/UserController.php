@@ -2,140 +2,109 @@
 
 namespace App\Http\Controllers\API;
 
-use App\Http\Controllers\Controller; // Import the base Controller class
-
-use App\Models\User;
+use App\Http\Controllers\Controller;
+use App\Services\UserService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 
 class UserController extends Controller
 {
-    // Get all users (Admin only)
+    protected $userService;
+
+    public function __construct(UserService $userService)
+    {
+        $this->userService = $userService;
+    }
+
     public function index()
     {
-        Log::info('Fetching all users', ['count' => User::count()]); // Logs the total users count
-        return response()->json(User::all(), 200);
+        return response()->json($this->userService->getAllUsers(), 200);
     }
 
-    // Get single user details
     public function show($id)
     {
-        $user = User::find($id);
-        if (!$user) return response()->json(['message' => 'User not found'], 404);
-
-        return response()->json($user, 200);
+        $user = $this->userService->getUserById($id);
+        return $user ? response()->json($user, 200) : response()->json(['message' => 'User not found'], 404);
     }
 
-    // Admin can update user details
     public function update(Request $request, $id)
     {
-        $user = User::find($id);
-        if (!$user) return response()->json(['message' => 'User not found'], 404);
-
-        $user->update($request->only(['name', 'email', 'phone']));
-        return response()->json(['message' => 'User updated successfully', 'user' => $user], 200);
+        $user = $this->userService->updateUser($id, $request->only(['name', 'email', 'phone']));
+        return $user ? response()->json(['message' => 'User updated successfully', 'user' => $user], 200)
+            : response()->json(['message' => 'User not found'], 404);
     }
 
-    // Ban user (Admin only)
-    public function banUser($id)
+
+    public function destroy($id)
     {
-        $user = User::find($id);
-        if (!$user) return response()->json(['message' => 'User not found'], 404);
-
-        $user->status = 'banned';
-        $user->save();
-        return response()->json(['message' => 'User banned successfully'], 200);
+        $deleted = $this->userService->deleteUser($id);
+        return $deleted
+            ? response()->json(['message' => 'User deleted successfully'], 200)
+            : response()->json(['message' => 'User not found'], 404);
     }
 
-    // Unban user (Admin only)
-    public function unbanUser($id)
+    public function suspendUser($id)
     {
-        $user = User::find($id);
-        if (!$user) return response()->json(['message' => 'User not found'], 404);
-
-        $user->status = 'active';
-        $user->save();
-        return response()->json(['message' => 'User unbanned successfully'], 200);
+        $user = $this->userService->suspendUser($id);
+        return $user ? response()->json(['message' => 'User suspended successfully'], 200)
+            : response()->json(['message' => 'User not found'], 404);
     }
 
-    // Reset user password (Admin only)
-    public function resetPassword(Request $request, $id)
+    public function activateUser($id)
     {
-        $user = User::find($id);
-        if (!$user) return response()->json(['message' => 'User not found'], 404);
-
-        $newPassword = 'Default@123';
-        $user->password = Hash::make($newPassword);
-        $user->save();
-
-        return response()->json(['message' => 'Password reset successfully', 'new_password' => $newPassword], 200);
+        $user = $this->userService->activateUser($id);
+        return $user ? response()->json(['message' => 'User activated successfully'], 200)
+            : response()->json(['message' => 'User not found'], 404);
     }
 
-    // Approve KYC (Admin only)
+    public function resetPassword($id)
+    {
+        $result = $this->userService->resetPassword($id);
+        return $result ? response()->json(['message' => 'Password reset successfully', 'new_password' => $result['new_password']], 200)
+            : response()->json(['message' => 'User not found'], 404);
+    }
+
     public function approveKYC($id)
     {
-        $user = User::find($id);
-        if (!$user) return response()->json(['message' => 'User not found'], 404);
-
-        $user->kyc_status = 'approved';
-        $user->save();
-
-        return response()->json(['message' => 'KYC approved successfully'], 200);
+        $user = $this->userService->approveKYC($id);
+        return $user ? response()->json(['message' => 'KYC approved successfully'], 200)
+            : response()->json(['message' => 'User not found'], 404);
     }
 
-    // Reject KYC (Admin only)
     public function rejectKYC($id)
     {
-        $user = User::find($id);
-        if (!$user) return response()->json(['message' => 'User not found'], 404);
-
-        $user->kyc_status = 'rejected';
-        $user->save();
-
-        return response()->json(['message' => 'KYC rejected successfully'], 200);
+        $user = $this->userService->rejectKYC($id);
+        return $user ? response()->json(['message' => 'KYC rejected successfully'], 200)
+            : response()->json(['message' => 'User not found'], 404);
     }
 
-    // Manually fund wallet (Admin only)
     public function fundWallet(Request $request, $id)
     {
-        $user = User::find($id);
-        if (!$user) return response()->json(['message' => 'User not found'], 404);
-
-        $amount = $request->amount;
-        $user->wallet_balance += $amount;
-        $user->save();
-
-        return response()->json(['message' => 'Wallet funded successfully', 'new_balance' => $user->wallet_balance], 200);
+        $user = $this->userService->fundWallet($id, $request->amount);
+        return $user ? response()->json(['message' => 'Wallet funded successfully', 'new_balance' => $user->wallet_balance], 200)
+            : response()->json(['message' => 'User not found'], 404);
     }
 
-    // Deduct from wallet (Admin only)
     public function deductWallet(Request $request, $id)
     {
-        $user = User::find($id);
-        if (!$user) return response()->json(['message' => 'User not found'], 404);
-
-        $amount = $request->amount;
-        if ($user->wallet_balance < $amount) {
-            return response()->json(['message' => 'Insufficient balance'], 400);
-        }
-
-        $user->wallet_balance -= $amount;
-        $user->save();
-
-        return response()->json(['message' => 'Amount deducted successfully', 'new_balance' => $user->wallet_balance], 200);
+        $user = $this->userService->deductWallet($id, $request->amount);
+        return $user ? response()->json(['message' => 'Amount deducted successfully', 'new_balance' => $user->wallet_balance], 200)
+            : response()->json(['message' => 'Insufficient balance or user not found'], 400);
     }
 
-    // Admin can update any user's profile by ID
-    public function updateProfile(Request $request, $id)
+    public function updateUserPassword(Request $request, $id)
     {
-        $user = User::find($id); // Find user by ID
-        if (!$user) {
+        $request->validate([
+            'new_password' => 'required|string|min:8',
+        ]);
+    
+        $userService = new UserService();
+        $user = $userService->updatePassword($id, $request->new_password);
+    
+        if ($user) {
+            return response()->json(['message' => 'Password updated successfully', 'user' => $user], 200);
+        } else {
             return response()->json(['message' => 'User not found'], 404);
         }
-
-        $user->update($request->only(['name', 'email', 'phone']));
-        return response()->json(['message' => 'User updated successfully', 'user' => $user], 200);
     }
 }

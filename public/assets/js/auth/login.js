@@ -16,12 +16,12 @@ document.addEventListener("DOMContentLoaded", () => {
         window.showLoadingAlert("Signing in...");
 
         try {
-            const data = await makeApiRequest("/api/v1/admin/login", "POST", { email, password, remember: rememberMe });
+            const data = await makeApiRequest("/api/v1/user/login", "POST", { email, password, remember: rememberMe });
             
-            window.storeSession("admin", data.admin); // Store session data
+            window.storeSession("admin", data.user); // Store session data
             window.storeSession("adminToken", data.token); // Store token
             window.showAlert("Login successful!", "Redirecting to dashboard...", "success")//Show Alert
-            setTimeout(() => (window.location.href = "/"), 2000);
+            setTimeout(() => (window.location.href = "/users"), 2000);
         } catch (error) {
             window.showAlert("Login Failed", error.message, "error");
         } finally {
