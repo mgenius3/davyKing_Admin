@@ -89,6 +89,59 @@ return [
     [
       'is_divider' => true
     ],
+
+    [
+      'text' => 'Crypto Management',
+      'is_header' => true
+    ],
+    [
+      'icon' => 'fab fa-bitcoin',
+      'text' => 'Crypto',
+      // 'label' => '6',
+      'children' => [[
+        'url' => '/crypto',
+        'action' => 'Crypto\'s',
+        'text' => 'Crypto\'s'
+      ], [
+        'url' => '/crypto/create-transaction',
+        'action' => 'New Transactions',
+        'text' => 'New Transactions'
+      ], [
+        'url' => '/crypto/all-transactions',
+        'action' => 'All Transactions',
+        'text' => 'All Transactions'
+      ]]
+    ],
+    [
+      'is_divider' => true
+    ],
+
+    [
+      'text' => 'Vtu Management',
+      'is_header' => true
+    ],
+    [
+      'icon' => 'fas fa-sim-card',
+      'text' => 'Vtu',
+      // 'label' => '6',
+      'children' => [[
+        'url' => '/vtu',
+        'action' => 'Vtu\'s',
+        'text' => 'Vtu\'s'
+      ], [
+        'url' => '/vtu/create-transaction',
+        'action' => 'New Transactions',
+        'text' => 'New Transactions'
+      ], [
+        'url' => '/vtu/all-transactions',
+        'action' => 'All Transactions',
+        'text' => 'All Transactions'
+      ]]
+    ],
+    [
+      'is_divider' => true
+    ],
+
     [
       'text' => 'Components',
       'is_header' => true

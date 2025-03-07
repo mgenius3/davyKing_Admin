@@ -5,6 +5,10 @@ use App\Http\Controllers\WEB\UserManagementController;
 use App\Http\Controllers\WEB\WebAuthController;
 use Illuminate\Support\Facades\Artisan;
 use App\Http\Controllers\WEB\AdminGiftCardController;
+use App\Http\Controllers\WEB\AdminCryptoController;
+use App\Http\Controllers\WEB\AdminVtuController;
+
+
 
 
 /*
@@ -69,6 +73,33 @@ Route::prefix('gift-cards')->middleware(['auth', 'admin'])->group(function () {
 	Route::get('/all-transactions', [AdminGiftCardController::class, 'allTransactions'])->name('admin.gift-cards.all-transactions');
 	Route::get('/user-transactions/{userId}', [AdminGiftCardController::class, 'userTransactions'])->name('admin.gift-cards.user-transactions');
 });
+
+//CRYPTO
+Route::prefix('crypto')->middleware(['auth', 'admin'])->group(function () {
+    Route::get('/', [AdminCryptoController::class, 'adminPage'])->name('admin.crypto');
+    Route::post('/', [AdminCryptoController::class, 'store'])->name('admin.crypto.store');
+    Route::post('/update-rates', [AdminCryptoController::class, 'updateRates'])->name('admin.crypto.update-rates');
+    Route::get('/create-transaction', [AdminCryptoController::class, 'createTransaction'])->name('admin.crypto.create-transaction');
+    Route::post('/store-transaction', [AdminCryptoController::class, 'storeTransaction'])->name('admin.crypto.store-transaction');
+    Route::get('/all-transactions', [AdminCryptoController::class, 'allTransactions'])->name('admin.crypto.all-transactions');
+    Route::get('/transaction/{transactionId}', [AdminCryptoController::class, 'transaction'])->name('admin.crypto.transaction');
+    Route::get('/transaction/{transactionId}/edit-status', [AdminCryptoController::class, 'editTransactionStatus'])->name('admin.crypto.edit-transaction-status');
+    Route::put('/transaction/{transactionId}/status', [AdminCryptoController::class, 'updateTransactionStatus'])->name('admin.crypto.update-transaction-status');
+    Route::post('/update-liquidity', [AdminCryptoController::class, 'updateLiquidity'])->name('admin.crypto.update-liquidity');
+});
+
+//VTU
+Route::prefix('vtu')->middleware(['auth', 'admin'])->group(function () {
+    Route::get('/', [AdminVtuController::class, 'adminPage'])->name('admin.vtu');
+    Route::post('/provider', [AdminVtuController::class, 'storeProvider'])->name('admin.vtu.store-provider');
+    Route::post('/provider/{providerId}', [AdminVtuController::class, 'updateProvider'])->name('admin.vtu.update-provider');
+    Route::post('/plan', [AdminVtuController::class, 'storePlan'])->name('admin.vtu.store-plan');
+    Route::get('/create-transaction', [AdminVtuController::class, 'createTransaction'])->name('admin.vtu.create-transaction');
+    Route::post('/store-transaction', [AdminVtuController::class, 'storeTransaction'])->name('admin.vtu.store-transaction');
+    Route::get('/all-transactions', [AdminVtuController::class, 'allTransactions'])->name('admin.vtu.all-transactions');
+    Route::post('/refund/{transactionId}', [AdminVtuController::class, 'refundTransaction'])->name('admin.vtu.refund-transaction');
+});
+
 
 Route::get('/analytics', function () {
 	return view('/pages/analytics');
