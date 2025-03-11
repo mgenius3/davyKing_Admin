@@ -7,8 +7,8 @@ use Illuminate\Support\Facades\Artisan;
 use App\Http\Controllers\WEB\AdminGiftCardController;
 use App\Http\Controllers\WEB\AdminCryptoController;
 use App\Http\Controllers\WEB\AdminVtuController;
-
-
+use App\Http\Controllers\WEB\AdminAdController;
+use App\Http\Controllers\LandingController;
 
 
 /*
@@ -22,13 +22,19 @@ use App\Http\Controllers\WEB\AdminVtuController;
 |
 */
 
-Route::get('/', function () {
+Route::get('/dashboard', function () {
 	return view('/pages/index');
 });
+
+Route::get('/', [LandingController::class, 'index'])->name('landing');
+Route::post('/contact', [LandingController::class, 'contact'])->name('contact');
+
 
 Route::get('/auth/login', function () {
 	return view('/auth/login');
 })->name("user.login");
+
+
 
 // User authentication routes
 Route::prefix('user')->group(function () {
@@ -98,6 +104,16 @@ Route::prefix('vtu')->middleware(['auth', 'admin'])->group(function () {
     Route::post('/store-transaction', [AdminVtuController::class, 'storeTransaction'])->name('admin.vtu.store-transaction');
     Route::get('/all-transactions', [AdminVtuController::class, 'allTransactions'])->name('admin.vtu.all-transactions');
     Route::post('/refund/{transactionId}', [AdminVtuController::class, 'refundTransaction'])->name('admin.vtu.refund-transaction');
+});
+
+//ADS 
+Route::middleware(['auth', 'admin'])->prefix('ads')->name('admin.ads.')->group(function () {
+    Route::get('/', [AdminAdController::class, 'index'])->name('index');
+    Route::get('/create', [AdminAdController::class, 'create'])->name('create');
+    Route::post('/', [AdminAdController::class, 'store'])->name('store');
+    Route::get('/{adId}/edit', [AdminAdController::class, 'edit'])->name('edit');
+    Route::put('/{adId}', [AdminAdController::class, 'update'])->name('update');
+    Route::delete('/{adId}', [AdminAdController::class, 'destroy'])->name('destroy');
 });
 
 

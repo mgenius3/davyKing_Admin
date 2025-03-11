@@ -19,7 +19,8 @@
         </div>
 
         <a href="/" class="brand-logo">
-            <img src="/assets/img/logo.png" class="invert-dark" alt="" height="20" />
+            {{-- <img src="/assets/img/logo.jpeg" class="invert-dark" alt="" height="40" /> --}}
+            <i>DavyKing</i>
         </a>
     </div>
     <!-- END brand -->

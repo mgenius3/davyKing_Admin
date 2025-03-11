@@ -5,6 +5,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\AdminAuthController;
 use App\Http\Controllers\API\UserController;
+use App\Http\Controllers\API\AdController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -51,8 +53,10 @@ Route::prefix('v1')->group(function () {
             Route::patch('/{id}/approve-kyc', [UserController::class, 'approveKYC']);
             Route::patch('/{id}/reject-kyc', [UserController::class, 'rejectKYC']);
         });
-
     });
+
+    //ADS
+    Route::get('/ads', [AdController::class, 'index'])->name('api.ads.index');
 
 
     // Authenticated user and admin routes

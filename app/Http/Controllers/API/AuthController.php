@@ -34,6 +34,9 @@ class AuthController extends Controller
             ]);
 
             $token = $user->createToken('user_token')->plainTextToken;
+            
+            $user = User::where('email', $validated['email'])->first();
+
 
             return response()->json(['user' => $user, 'token' => $token], 201);
         } catch (ValidationException $e) {

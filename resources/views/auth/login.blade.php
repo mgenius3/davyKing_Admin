@@ -38,9 +38,9 @@
         </div>
       </div>
       <button id="login_button" class="btn btn-theme btn-lg d-block w-100 fw-500 mb-3" type="submit">Sign In</button>
-      <div class="text-center text-muted">
+      {{-- <div class="text-center text-muted">
         Don't have an account yet? <a href="/page/register">Sign up</a>.
-      </div>
+      </div> --}}
     </form>
   </div>
 </div>
