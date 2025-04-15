@@ -10,6 +10,13 @@
         </div>
     </div>
 
+    @if (session('success'))
+        <div class="alert alert-success">{{ session('success') }}</div>
+    @endif
+    @if (session('error'))
+        <div class="alert alert-danger">{{ session('error') }}</div>
+    @endif
+
     <div class="row gx-4">
         <div class="col-xl-8">
             <!-- Crypto Catalog -->
@@ -20,11 +27,28 @@
                 </div>
                 <div class="card-body">
                     @foreach ($cryptos as $crypto)
-                        <div class="row align-items-center">
-                            <div class="col-md-4">{{ $crypto->name }} ({{ $crypto->symbol }})</div>
+                        <div class="row align-items-center mb-3">
+                            <div class="col-md-4">
+                                @if ($crypto->image)
+                                    <img src="{{ asset('storage/' . $crypto->image) }}" alt="{{ $crypto->name }}" style="width: 30px; height: 30px; margin-right: 10px;">
+                                @endif
+                                {{ $crypto->name }} ({{ $crypto->symbol }})
+                            </div>
                             <div class="col-md-4">Buy: ${{ $crypto->buy_rate }} | Sell: ${{ $crypto->sell_rate }}</div>
                             <div class="col-md-4 text-end">
-                                <span class="badge {{ $crypto->is_enabled ? 'bg-success' : 'bg-danger' }}">{{ $crypto->is_enabled ? 'Enabled' : 'Disabled' }}</span>
+                                {{-- <span class="badge {{ $crypto->is_enabled ? 'bg-success' : 'bg-danger' }}">{{ $crypto->is_enabled ? 'Enabled' : 'Disabled' }}</span> --}}
+                                <form action="{{ route('admin.crypto.toggle', $crypto->id) }}" method="POST" style="display: inline;">
+                                    @csrf
+                                    <input type="hidden" name="is_enabled" value="{{ $crypto->is_enabled ? 0 : 1 }}">
+                                    <button type="submit" class="btn btn-sm {{ $crypto->is_enabled ? 'btn-warning' : 'btn-success' }}">
+                                        {{ $crypto->is_enabled ? 'Disable' : 'Enable' }}
+                                    </button>
+                                </form>
+                                <form action="{{ route('admin.crypto.delete', $crypto->id) }}" method="POST" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete this cryptocurrency?');">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                                </form>
                             </div>
                         </div>
                         @if (!$loop->last)
@@ -140,28 +164,50 @@
                     <h5 class="modal-title" id="addCryptoModalLabel">Add New Cryptocurrency</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <form action="{{ route('admin.crypto.store') }}" method="POST">
+                <form action="{{ route('admin.crypto.store') }}" method="POST" enctype="multipart/form-data">
                     @csrf
                     <div class="modal-body">
                         <div class="mb-3">
                             <label class="form-label">Name</label>
-                            <input type="text" class="form-control" name="name" required>
+                            <input type="text" class="form-control @error('name') is-invalid @enderror" name="name" required>
+                            @error('name')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Symbol</label>
-                            <input type="text" class="form-control" name="symbol" required>
+                            <input type="text" class="form-control @error('symbol') is-invalid @enderror" name="symbol" required>
+                            @error('symbol')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Network</label>
-                            <input type="text" class="form-control" name="network" placeholder="e.g., Bitcoin, ERC-20">
+                            <input type="text" class="form-control @error('network') is-invalid @enderror" name="network" placeholder="e.g., Bitcoin, ERC-20">
+                            @error('network')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Buy Rate</label>
-                            <input type="number" step="0.01" class="form-control" name="buy_rate" required>
+                            <input type="number" step="0.01" class="form-control @error('buy_rate') is-invalid @enderror" name="buy_rate" required>
+                            @error('buy_rate')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Sell Rate</label>
-                            <input type="number" step="0.01" class="form-control" name="sell_rate" required>
+                            <input type="number" step="0.01" class="form-control @error('sell_rate') is-invalid @enderror" name="sell_rate" required>
+                            @error('sell_rate')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Image</label>
+                            <input type="file" class="form-control @error('image') is-invalid @enderror" name="image" accept="image/*" required>
+                            @error('image')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
                         </div>
                     </div>
                     <div class="modal-footer">

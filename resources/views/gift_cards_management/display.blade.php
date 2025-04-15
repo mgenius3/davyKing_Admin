@@ -32,9 +32,6 @@
                 <i class="fa fa-gear me-2 text-body text-opacity-50 my-n1"></i> More Actions
             </a>
             <div class="dropdown-menu">
-                {{-- <a class="dropdown-item" href="#">Export Transactions</a>
-                <a class="dropdown-item" href="#">Update All Rates</a>
-                <a class="dropdown-item" href="#">Disable All Cards</a> --}}
                 <a class="dropdown-item" href="{{ route('admin.gift-cards.create-transaction') }}">Create New Transaction</a>
             </div>
         </div>
@@ -55,12 +52,19 @@
                         <div class="row align-items-center">
                             <div class="col-lg-5 d-flex align-items-center">
                                 <div class="h-65px w-65px d-flex align-items-center justify-content-center position-relative bg-body rounded p-2">
-                                    <img src="{{ $giftCard->image ? asset('storage/' . $giftCard->image) : asset('assets/img/giftcard/default.png') }}" alt="{{ $giftCard->name }}" class="mw-100 mh-100">
+                                    <img src="{{ $giftCard->image ? asset($giftCard->image) : asset('assets/img/giftcard/default.png') }}" alt="{{ $giftCard->name }}" class="mw-100 mh-100">
                                 </div>
                                 <div class="ps-3 flex-1">
                                     <div><a href="#" class="text-decoration-none text-body">{{ $giftCard->name }}</a></div>
                                     <div class="text-body text-opacity-50 small">
                                         Category: {{ $giftCard->category }} | ${{ $giftCard->denomination }} | Stock: {{ $giftCard->stock ?? 'N/A' }}
+                                    </div>
+                                    <div class="text-body text-opacity-50 small">
+                                        Ranges: 
+                                        @php
+                                            $ranges = is_string($giftCard->ranges) ? json_decode($giftCard->ranges, true) : $giftCard->ranges;
+                                        @endphp
+                                        {{ $ranges && is_array($ranges) ? implode(', ', $ranges) : 'Not set' }}
                                     </div>
                                 </div>
                             </div>
@@ -108,13 +112,36 @@
                                             </div>
                                             <div class="mb-3">
                                                 <label class="form-label">Stock</label>
-                                                <input type="number" class="form-control" name="stock" value="{{ $giftCard->stock }}" placeholder="e.g., 100">
+                                                <input type="number" class="form-control" name="stock" value="{{ $giftCard->stock }}" placeholder="e.g., 100" required>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">Ranges</label>
+                                                <div id="edit-ranges-container-{{ $giftCard->id }}">
+                                                    @php
+                                                        $ranges = is_string($giftCard->ranges) ? json_decode($giftCard->ranges, true) : $giftCard->ranges;
+                                                        $ranges = is_array($ranges) ? $ranges : [];
+                                                    @endphp
+                                                    @if (!empty($ranges))
+                                                        @foreach ($ranges as $range)
+                                                            <div class="range-input mb-2 d-flex align-items-center">
+                                                                <input type="text" class="form-control me-2" name="ranges[]" value="{{ $range }}" placeholder="e.g., $100 - $200">
+                                                                <button type="button" class="btn btn-danger btn-sm" onclick="this.parentElement.remove()">Remove</button>
+                                                            </div>
+                                                        @endforeach
+                                                    @else
+                                                        <div class="range-input mb-2 d-flex align-items-center">
+                                                            <input type="text" class="form-control me-2" name="ranges[]" placeholder="e.g., 100 - 200">
+                                                            <button type="button" class="btn btn-danger btn-sm" onclick="this.parentElement.remove()">Remove</button>
+                                                        </div>
+                                                    @endif
+                                                </div>
+                                                <button type="button" class="btn btn-outline-primary mt-2" onclick="addRange('edit-ranges-container-{{ $giftCard->id }}')">Add Range</button>
                                             </div>
                                             <div class="mb-3">
                                                 <label class="form-label">Image</label>
                                                 <input type="file" class="form-control" name="image" accept="image/*">
                                                 @if ($giftCard->image)
-                                                    <img src="{{ asset('storage/' . $giftCard->image) }}" alt="{{ $giftCard->name }}" class="mt-2" style="max-width: 100px;">
+                                                    <img src="{{ asset($giftCard->image) }}" alt="{{ $giftCard->name }}" class="mt-2" style="max-width: 100px;">
                                                 @endif
                                             </div>
                                         </div>
@@ -268,7 +295,17 @@
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Stock</label>
-                            <input type="number" class="form-control" name="stock" placeholder="e.g., 100">
+                            <input type="number" class="form-control" name="stock" placeholder="e.g., 100" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Ranges</label>
+                            <div id="add-ranges-container">
+                                <div class="range-input mb-2 d-flex align-items-center">
+                                    <input type="text" class="form-control me-2" name="ranges[]" placeholder="e.g., $100 - $200">
+                                    <button type="button" class="btn btn-danger btn-sm" onclick="this.parentElement.remove()">Remove</button>
+                                </div>
+                            </div>
+                            <button type="button" class="btn btn-outline-primary mt-2" onclick="addRange('add-ranges-container')">Add Range</button>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Image</label>
@@ -295,6 +332,18 @@
             currentBuyRate.textContent = selectedOption.dataset.buyRate || 'N/A';
             currentSellRate.textContent = selectedOption.dataset.sellRate || 'N/A';
         });
+
+        // Function to add a new range input
+        function addRange(containerId) {
+            const container = document.getElementById(containerId);
+            const newInput = document.createElement('div');
+            newInput.className = 'range-input mb-2 d-flex align-items-center';
+            newInput.innerHTML = `
+                <input type="text" class="form-control me-2" name="ranges[]" placeholder="e.g., $100 - $200">
+                <button type="button" class="btn btn-danger btn-sm" onclick="this.parentElement.remove()">Remove</button>
+            `;
+            container.appendChild(newInput);
+        }
 
         // Initialize Tooltips
         var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));

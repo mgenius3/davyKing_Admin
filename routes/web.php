@@ -9,6 +9,7 @@ use App\Http\Controllers\WEB\AdminCryptoController;
 use App\Http\Controllers\WEB\AdminVtuController;
 use App\Http\Controllers\WEB\AdminAdController;
 use App\Http\Controllers\LandingController;
+use App\Http\Controllers\WEB\AdminBankDetailsController;
 
 
 /*
@@ -92,6 +93,9 @@ Route::prefix('crypto')->middleware(['auth', 'admin'])->group(function () {
     Route::get('/transaction/{transactionId}/edit-status', [AdminCryptoController::class, 'editTransactionStatus'])->name('admin.crypto.edit-transaction-status');
     Route::put('/transaction/{transactionId}/status', [AdminCryptoController::class, 'updateTransactionStatus'])->name('admin.crypto.update-transaction-status');
     Route::post('/update-liquidity', [AdminCryptoController::class, 'updateLiquidity'])->name('admin.crypto.update-liquidity');
+	Route::post('/{cryptoId}/toggle', [AdminCryptoController::class, 'toggle'])->name('admin.crypto.toggle');
+	Route::delete('/{cryptoId}', [AdminCryptoController::class, 'deleteCrypto'])->name('admin.crypto.delete');
+	Route::delete('/transaction/{transactionId}', [AdminCryptoController::class, 'deleteTransaction'])->name('admin.crypto.transaction.delete');
 });
 
 //VTU
@@ -114,6 +118,13 @@ Route::middleware(['auth', 'admin'])->prefix('ads')->name('admin.ads.')->group(f
     Route::get('/{adId}/edit', [AdminAdController::class, 'edit'])->name('edit');
     Route::put('/{adId}', [AdminAdController::class, 'update'])->name('update');
     Route::delete('/{adId}', [AdminAdController::class, 'destroy'])->name('destroy');
+});
+
+//BANK DETAILS
+Route::prefix('bank-details')->middleware(['auth', 'admin'])->group(function () {
+    Route::get('/', [AdminBankDetailsController::class, 'index'])->name('admin.bank-details.index');
+    Route::post('/', [AdminBankDetailsController::class, 'store'])->name('admin.bank-details.store');
+    Route::delete('/{id}', [AdminBankDetailsController::class, 'delete'])->name('admin.bank-details.delete');
 });
 
 

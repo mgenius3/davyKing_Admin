@@ -30,6 +30,9 @@ class AdminGiftCardController extends Controller
             'buy_rate' => 'required|numeric|min:0|max:1',
             'sell_rate' => 'required|numeric|min:0|max:1',
             'image' => 'nullable|image|max:2048', // Max 2MB
+            'stock' => 'required|integer|min:0',
+            'ranges' => 'nullable|array', // Validate ranges as an array
+            'ranges.*' => 'string', // Each range should be a string
         ]);
 
         $data = $request->all();
@@ -50,6 +53,9 @@ class AdminGiftCardController extends Controller
             'category' => 'required|string|max:255',
             'denomination' => 'required|numeric|min:0',
             'image' => 'nullable|image|max:2048',
+            'stock' => 'sometimes|integer|min:0',
+            'ranges' => 'nullable|array', // Validate ranges as an array
+            'ranges.*' => 'string', // Each range should be a string
         ]);
 
         $data = $request->all();

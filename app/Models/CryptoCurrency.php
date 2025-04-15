@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class CryptoCurrency extends Model
 {
-    protected $fillable = ['name', 'symbol', 'network', 'buy_rate', 'sell_rate', 'is_enabled'];
+    protected $fillable = ['name', 'symbol', 'network', 'buy_rate', 'sell_rate', 'is_enabled', 'image'];
 
     public function transactions()
     {

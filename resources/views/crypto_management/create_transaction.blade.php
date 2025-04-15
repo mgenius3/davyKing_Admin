@@ -7,6 +7,20 @@
         <h1 class="page-header mb-0">Create Crypto Transaction</h1>
     </div>
 
+    <!-- Display Error Message -->
+    @if (session('error'))
+        <div class="alert alert-danger">
+            {{ session('error') }}
+        </div>
+    @endif
+
+    <!-- Display Success Message -->
+    @if (session('success'))
+        <div class="alert alert-success">
+            {{ session('success') }}
+        </div>
+    @endif
+
     <div class="card">
         <div class="card-header bg-none fw-semibold">New Transaction</div>
         <div class="card-body">
@@ -26,16 +40,18 @@
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Cryptocurrency</label>
-                    <select class="form-select @error('crypto_currency_id') is-invalid @enderror" name="crypto_currency_id" required>
+                    <select class="form-select @error('crypto_currency_id') is-invalid @enderror" name="crypto_currency_id" id="cryptoCurrency" required>
                         <option value="">Select a cryptocurrency</option>
                         @foreach ($cryptos as $crypto)
-                            <option value="{{ $crypto->id }}">{{ $crypto->name }} ({{ $crypto->symbol }})</option>
+                            <option value="{{ $crypto->id }}" data-name="{{ $crypto->name }}">{{ $crypto->name }} ({{ $crypto->symbol }})</option>
                         @endforeach
                     </select>
                     @error('crypto_currency_id')
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
                 </div>
+                <!-- Hidden field to store crypto name -->
+                <input type="hidden" name="crypto_name" id="cryptoName">
                 <div class="mb-3">
                     <label class="form-label">Type</label>
                     <select class="form-select @error('type') is-invalid @enderror" name="type" id="transactionType" required>
@@ -54,9 +70,9 @@
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
                 </div>
-                <div class="mb-3">
+                <div class="mb-3" id="payment_method_container">
                     <label class="form-label">Payment Method</label>
-                    <select class="form-select @error('payment_method') is-invalid @enderror" name="payment_method" required>
+                    <select class="form-select @error('payment_method') is-invalid @enderror" name="payment_method" id="payment_method" required>
                         <option value="bank_transfer">Bank Transfer</option>
                         <option value="wallet_balance">Wallet Balance</option>
                     </select>
@@ -73,7 +89,14 @@
                 </div>
                 <div class="mb-3" id="proofFileField" style="display: none;">
                     <label class="form-label">Proof of Money Transfer (e.g., bank receipt)</label>
-                    <input type="file" class="form-control @error('proof_file') is-invalid @enderror" name="proof_file" accept="image/*,application/pdf">
+                    <input type="file" class="form-control @error('proof_file') is-invalid @enderror" name="proof_file" id="proof_file_buy" accept="image/*,application/pdf">
+                    @error('proof_file')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+                <div class="mb-3" id="proofFileFieldSell" style="display: none;">
+                    <label class="form-label">Proof of Coin Transfer (e.g., binance receipt)</label>
+                    <input type="file" class="form-control @error('proof_file') is-invalid @enderror" name="proof_file" id="proof_file_sell" accept="image/*,application/pdf">
                     @error('proof_file')
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
@@ -96,26 +119,55 @@
 
 @push('other_scripts')
 <script>
+    const proofFileField = document.getElementById('proofFileField');
+
+    // Update crypto name when a cryptocurrency is selected
+    document.getElementById('cryptoCurrency').addEventListener('change', function() {
+        const selectedOption = this.options[this.selectedIndex];
+        const cryptoName = selectedOption.getAttribute('data-name');
+        document.getElementById('cryptoName').value = cryptoName || '';
+    });
+
     document.getElementById('transactionType').addEventListener('change', function() {
         const type = this.value;
         const walletAddressField = document.getElementById('walletAddressField');
-        const proofFileField = document.getElementById('proofFileField');
+        const proofFileFieldSell = document.getElementById('proofFileFieldSell');
+        const payment_method_container = document.getElementById('payment_method_container');
 
         if (type === 'buy') {
             walletAddressField.style.display = 'block';
-            proofFileField.style.display = 'none';
+            proofFileField.style.display = 'block';
+            proofFileFieldSell.style.display = 'none';
+            payment_method_container.style.display = "block";
             document.querySelector('input[name="wallet_address"]').required = true;
-            document.querySelector('input[name="proof_file"]').required = false;
+            document.querySelector('input[id="proof_file_buy"]').required = true;
+            document.querySelector('input[id="proof_file_sell"]').required = false;
         } else if (type === 'sell') {
             walletAddressField.style.display = 'none';
-            proofFileField.style.display = 'block';
+            proofFileFieldSell.style.display = 'block';
+            proofFileField.style.display = 'none';
+            payment_method_container.style.display = "none";
             document.querySelector('input[name="wallet_address"]').required = false;
-            document.querySelector('input[name="proof_file"]').required = true;
+            document.querySelector('input[id="proof_file_sell"]').required = true;
+            document.querySelector('input[id="proof_file_buy"]').required = false;
         } else {
             walletAddressField.style.display = 'none';
             proofFileField.style.display = 'none';
+            proofFileFieldSell.style.display = 'none'; 
+            payment_method_container.style.display = "none";
             document.querySelector('input[name="wallet_address"]').required = false;
             document.querySelector('input[name="proof_file"]').required = false;
+        }
+    });
+
+    document.getElementById('payment_method').addEventListener("change", function() {
+        const type = this.value;
+        if (type === 'wallet_balance') {
+            proofFileField.style.display = 'none';
+            document.querySelector('input[id="proof_file_buy"]').required = false;
+        } else {
+            proofFileField.style.display = 'block';
+            document.querySelector('input[id="proof_file_buy"]').required = true;
         }
     });
 </script>

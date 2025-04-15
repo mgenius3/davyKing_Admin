@@ -28,6 +28,8 @@ class AdminAdController extends Controller
         return view('ads_management.create_ad');
     }
 
+    
+
     public function store(Request $request)
     {
         $request->validate([

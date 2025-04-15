@@ -3,9 +3,13 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\AuthController;
-use App\Http\Controllers\API\AdminAuthController;
 use App\Http\Controllers\API\UserController;
 use App\Http\Controllers\API\AdController;
+use App\Http\Controllers\Api\GiftCardController;
+use App\Http\Controllers\Api\TransactionLogController;
+use App\Http\Controllers\API\CryptoController;
+use App\Http\Controllers\API\BankDetailsController;
+
 
 
 /*
@@ -57,6 +61,41 @@ Route::prefix('v1')->group(function () {
 
     //ADS
     Route::get('/ads', [AdController::class, 'index'])->name('api.ads.index');
+
+    //GIFTCARD
+    Route::middleware(['auth:sanctum'])->group(function () {
+        // Gift Card Endpoints
+        Route::prefix('gift-cards')->group(function () {
+            Route::get('/', [GiftCardController::class, 'index'])->name('api.gift-cards.index');
+            Route::get('/{giftCardId}', [GiftCardController::class, 'show'])->name('api.gift-cards.show');
+
+            // Transaction Endpoints
+            Route::post('/transactions', [GiftCardController::class, 'storeTransaction'])->name('api.transactions.store');
+            Route::get('/transactions/user', [GiftCardController::class, 'userTransactions'])->name('api.transactions.user');
+            Route::get('/transactions/{transactionId}', [GiftCardController::class, 'transaction'])->name('api.transactions.show');
+            Route::put('/transactions/{transactionId}/status', [GiftCardController::class, 'updateTransactionStatus'])->name('api.transactions.update-status');
+        });
+    });
+
+    //CRYPTO
+    Route::middleware(['auth:sanctum'])->group(
+        function () {
+            Route::prefix('crypto')->group(function () {
+                Route::get('/', [CryptoController::class, 'getCryptocurrencies']);
+                Route::post('/transactions', [CryptoController::class, 'storeTransaction']);
+                Route::get('/transactions', [CryptoController::class, 'getUserTransactions']);
+                Route::get('/transactions/{transactionId}', [CryptoController::class, 'getTransaction']);
+            });
+        }
+    );
+
+    //TRANSACTION LOG
+    Route::middleware(['auth:sanctum'])->group(function () {
+        Route::get('/transaction-logs', [TransactionLogController::class, 'getTransactionLogs']);
+    });
+
+    //ADMIN BANK DETAILS
+    Route::get('/bank-details', [BankDetailsController::class, 'index'])->name('api.bank-details.index');
 
 
     // Authenticated user and admin routes

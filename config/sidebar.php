@@ -168,6 +168,15 @@ return [
       ]
     ],
 
+    [
+      'text' => 'Bank Management',
+      'is_header' => true
+    ],
+    [
+      'url' => '/bank-details',
+      'icon' => 'fa fa-bank',
+      'text' => 'Bank Settings'
+    ],
     // [
     //   'text' => 'Components',
     //   'is_header' => true

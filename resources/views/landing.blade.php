@@ -103,7 +103,7 @@
             <div class="service-item d-flex">
               <div class="icon flex-shrink-0"><i class="bi bi-phone"></i></div>
               <div>
-                <h4 class="title"><a href="#" class="stretched-link">VTU Services</a></h4>
+                <h4 class="title"><a href="#" class="stretched-link">VTU Services and Bill Payment</a></h4>
                 <p class="description">Top up airtime, data, pay TV subscriptions, and electricity bills seamlessly.</p>
               </div>
             </div>
@@ -116,6 +116,16 @@
               <div>
                 <h4 class="title"><a href="#" class="stretched-link">Gift Cards</a></h4>
                 <p class="description">Buy, sell, and manage gift cards from various brands effortlessly.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="300">
+            <div class="service-item d-flex">
+              <div class="icon flex-shrink-0"><i class="bi bi-gift"></i></div>
+              <div>
+                <h4 class="title"><a href="#" class="stretched-link">Pay Tv subscriptions</a></h4>
+                <p class="description">Pay your dstv, gotv subscriptions</p>
               </div>
             </div>
           </div>
