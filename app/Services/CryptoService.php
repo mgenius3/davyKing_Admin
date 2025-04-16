@@ -6,6 +6,7 @@ use App\Models\CryptoCurrency;
 use App\Models\CryptoTransaction;
 use App\Models\SystemWallet;
 use App\Models\AuditLog;
+use App\Models\ExchangeRate;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB; // Add this import for the DB facade
 
@@ -95,16 +96,30 @@ class CryptoService
     {
         return DB::transaction(function () use ($data, $userId) {
             $crypto = CryptoCurrency::findOrFail($data['crypto_currency_id']);
-            $data['fiat_amount'] = $data['type'] === 'buy'
+
+            // Fetch the exchange rate for the currency (assuming fiat amounts are in NGN)
+            $exchangeRate = ExchangeRate::where('currency_code', 'NGN')->first();
+            if (!$exchangeRate) {
+                throw new \Exception('Exchange rate for NGN not found');
+            }
+
+            // Calculate the fiat amount in NGN
+            $fiatAmountInNGN = $data['type'] === 'buy'
                 ? $data['amount'] * $crypto->buy_rate
                 : $data['amount'] * $crypto->sell_rate;
+
+            // Convert the fiat amount to NGN using the exchange rate
+            $data['fiat_amount'] = $fiatAmountInNGN * $exchangeRate->rate;
+
+            // $data['fiat_amount'] = $data['type'] === 'buy'
+            //     ? $data['amount'] * $crypto->buy_rate
+            //     : $data['amount'] * $crypto->sell_rate;
 
             // Deduct from user's wallet for buy transactions with wallet_balance
             if ($data['type'] === 'buy' && $data['payment_method'] === 'wallet_balance') {
                 $fiatAmount = $data['fiat_amount'];
                 $user = $this->userService->deductWallet($userId, $fiatAmount);
                 if (!$user) {
-                    dump("Insufficient wallet balance for this transaction");
                     throw new \Exception('Insufficient wallet balance for this transaction');
                 }
 

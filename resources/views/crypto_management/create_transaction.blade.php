@@ -31,7 +31,7 @@
                     <select class="form-select @error('user_id') is-invalid @enderror" name="user_id" required>
                         <option value="">Select a user</option>
                         @foreach ($users as $user)
-                            <option value="{{ $user->id }}">{{ $user->name }}</option>
+                            <option value="{{ $user->id }}">{{ $user->name }} ({{ $user->email }})</option>
                         @endforeach
                     </select>
                     @error('user_id')

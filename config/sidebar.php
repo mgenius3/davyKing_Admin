@@ -167,7 +167,9 @@ return [
       
       ]
     ],
-
+    [
+      'is_divider' => true
+    ],
     [
       'text' => 'Bank Management',
       'is_header' => true
@@ -176,6 +178,18 @@ return [
       'url' => '/bank-details',
       'icon' => 'fa fa-bank',
       'text' => 'Bank Settings'
+    ],
+    [
+      'is_divider' => true
+    ],
+    [
+      'text' => 'Exchange Rate',
+      'is_header' => true
+    ],
+    [
+      'url' => '/exchange-rates',
+      'icon' => 'fa fa-exchange',
+      'text' => 'Exchange Rates'
     ],
     // [
     //   'text' => 'Components',

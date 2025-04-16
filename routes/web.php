@@ -10,7 +10,7 @@ use App\Http\Controllers\WEB\AdminVtuController;
 use App\Http\Controllers\WEB\AdminAdController;
 use App\Http\Controllers\LandingController;
 use App\Http\Controllers\WEB\AdminBankDetailsController;
-
+use App\Http\Controllers\WEB\AdminExchangeRateController;
 
 /*
 |--------------------------------------------------------------------------
@@ -127,6 +127,17 @@ Route::prefix('bank-details')->middleware(['auth', 'admin'])->group(function () 
     Route::delete('/{id}', [AdminBankDetailsController::class, 'delete'])->name('admin.bank-details.delete');
 });
 
+//EXCHAGE REATE
+ // New exchange rate routes
+ Route::prefix('exchange-rates')->middleware(['auth', 'admin'])->group(function () {
+	Route::get('/', [AdminExchangeRateController::class, 'index'])->name('admin.exchange-rates.index');
+	Route::get('/create', [AdminExchangeRateController::class, 'create'])->name('admin.exchange-rates.create');
+	Route::post('/', [AdminExchangeRateController::class, 'store'])->name('admin.exchange-rates.store');
+	Route::get('/{exchangeRate}/edit', [AdminExchangeRateController::class, 'edit'])->name('admin.exchange-rates.edit');
+	Route::put('/{exchangeRate}', [AdminExchangeRateController::class, 'update'])->name('admin.exchange-rates.update');
+	Route::delete('/{exchangeRate}', [AdminExchangeRateController::class, 'destroy'])->name('admin.exchange-rates.destroy');
+});
+ 
 
 Route::get('/analytics', function () {
 	return view('/pages/analytics');

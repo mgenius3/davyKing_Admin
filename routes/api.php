@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\GiftCardController;
 use App\Http\Controllers\Api\TransactionLogController;
 use App\Http\Controllers\API\CryptoController;
 use App\Http\Controllers\API\BankDetailsController;
+use App\Http\Controllers\API\ExchangeRateController;
 
 
 
@@ -96,6 +97,13 @@ Route::prefix('v1')->group(function () {
 
     //ADMIN BANK DETAILS
     Route::get('/bank-details', [BankDetailsController::class, 'index'])->name('api.bank-details.index');
+
+    //EXCHANGE RATES
+    Route::get('/exchange-rates', [ExchangeRateController::class, 'index'])->name('api.exchange-rates.index');
+    Route::get('/exchange-rates/{currencyCode}', [ExchangeRateController::class, 'show'])->name('api.exchange-rates.show');
+    Route::post('/exchange-rates', [ExchangeRateController::class, 'store'])->name('api.exchange-rates.store');
+    Route::put('/exchange-rates/{currencyCode}', [ExchangeRateController::class, 'update'])->name('api.exchange-rates.update');
+    Route::delete('/exchange-rates/{currencyCode}', [ExchangeRateController::class, 'destroy'])->name('api.exchange-rates.destroy');
 
 
     // Authenticated user and admin routes
